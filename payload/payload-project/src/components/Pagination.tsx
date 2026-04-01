@@ -39,7 +39,7 @@ export default function Pagination({ totalPages, currentPage }: PaginationProps)
   if (totalPages <= 1) return null
 
   return (
-    <div className="flex flex-col items-center space-y-4 py-16">
+    <div className="flex flex-col items-center">
       <div className="flex items-center gap-2">
         {/* Previous Button */}
         <button
@@ -97,7 +97,7 @@ export default function Pagination({ totalPages, currentPage }: PaginationProps)
       </div>
 
       {/* Info Text */}
-      <p className="text-xs font-medium text-slate-400 uppercase tracking-widest">
+      <p className="text-xs font-medium text-slate-400 uppercase tracking-widest mt-2">
         Page {currentPage} of {totalPages}
       </p>
     </div>

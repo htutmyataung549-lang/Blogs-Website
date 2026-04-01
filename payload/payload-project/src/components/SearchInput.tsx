@@ -17,7 +17,7 @@ export default function SearchInput() {
       } else {
         router.push(`/`)
       }
-      router.refresh() // Search query ပြောင်းလဲတဲ့အခါ page ကို refresh လုပ်ရန်
+      router.refresh()
     }, 500)
 
     return () => clearTimeout(delayDebounceFn)

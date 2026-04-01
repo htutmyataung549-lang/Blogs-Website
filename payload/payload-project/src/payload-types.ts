@@ -71,6 +71,7 @@ export interface Config {
     media: Media;
     posts: Post;
     comment: Comment;
+    categories: Category;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -82,6 +83,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     comment: CommentSelect<false> | CommentSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -187,6 +189,18 @@ export interface Post {
   content?: string | null;
   author?: (number | null) | User;
   featuredImage?: (number | null) | Media;
+  category?: (number | null) | Category;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: number;
+  title: string;
+  slug: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -241,6 +255,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'comment';
         value: number | Comment;
+      } | null)
+    | ({
+        relationTo: 'categories';
+        value: number | Category;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -349,6 +367,7 @@ export interface PostsSelect<T extends boolean = true> {
   content?: T;
   author?: T;
   featuredImage?: T;
+  category?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -360,6 +379,16 @@ export interface CommentSelect<T extends boolean = true> {
   post?: T;
   userName?: T;
   content?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
   updatedAt?: T;
   createdAt?: T;
 }

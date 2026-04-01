@@ -25,6 +25,13 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
   if (!post) return notFound()
 
+  // ---  Reading Time Logic ---
+  const wordsPerMinute = 200
+  const noOfWords = (typeof post.content === 'string' ? post.content : '').split(/\s/g).length || 0
+  const minutes = Math.ceil(noOfWords / wordsPerMinute)
+  const readTime = `${minutes} min read`
+  // ------------------------------------------
+
   const commentResult = await payload.find({
     collection: 'comment',
     where: { post: { equals: post.id } },
@@ -33,6 +40,14 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
   return (
     <article className="max-w-4xl mx-auto py-10 px-6">
+      {post.category && typeof post.category === 'object' && (
+        <Link
+          href={`/?category=${post.category.slug}`}
+          className="inline-block px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-xs font-bold uppercase tracking-wider mb-4 hover:bg-indigo-100 transition-colors"
+        >
+          {post.category.title}
+        </Link>
+      )}
       <h1 className="text-5xl font-black text-slate-900 mb-8">{post.title}</h1>
       <Link
         href={'/'}
@@ -82,6 +97,8 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               ? (post.author as any).name
               : 'Administrator'}
           </span>
+          {/* --- Reading Time  --- */}
+          <span className="text-slate- 600 font-normal ml-2"> • {readTime}</span>
           <span>
             {/* email ကိုလည်း ထိုနည်းအတိုင်းပဲ object ထဲကနေ ဆွဲထုတ်ပါမယ် */}
             Email:{' '}

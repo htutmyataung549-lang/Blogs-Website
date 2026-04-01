@@ -50,5 +50,15 @@ export const Posts: CollectionConfig = {
       relationTo: 'media',
       required: false,
     },
+    {
+      name: 'category',
+      type: 'relationship',
+      relationTo: 'categories',
+      hasMany: false, // Post တစ်ခုမှာ Category တစ်ခုပဲ ထားချင်ရင် false ထားပါ
+      required: false,
+      admin: {
+        position: 'sidebar',
+      },
+    },
   ],
 }

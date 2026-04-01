@@ -1,6 +1,7 @@
 import React from 'react'
 import './styles.css'
 import { Roboto } from 'next/font/google'
+import Navbar from '@/components/Navbar'
 
 export const metadata = {
   description: 'A blank template using Payload in a Next.js app.',
@@ -16,7 +17,10 @@ const roboto = Roboto({
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${roboto.className} bg-[#FDFDFD] text-slate-800`}>{children}</body>
+      <body className={`${roboto.className} bg-[#FDFDFD] text-slate-800`}>
+        <Navbar />
+        {children}
+      </body>
     </html>
   )
 }
