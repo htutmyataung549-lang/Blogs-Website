@@ -1,15 +1,38 @@
 'use client'
 import { Loader2 } from 'lucide-react'
-import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
 
-export default function CommentsForm({ postId }: { postId?: number }) {
-  const [name, setName] = useState('')
+interface User {
+  id: string | number
+  name?: string
+  email: string
+}
+
+interface CommentsFormProps {
+  postId?: number
+  user: User | null
+}
+
+export default function CommentsForm({ postId, user }: CommentsFormProps) {
+  const [name, setName] = useState(user ? user.name || 'Anonymous' : '')
   const [comment, setComment] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // src/components/CommentsForm.tsx ထဲက handleSubmit အပိုင်း
+  const router = useRouter()
+
+  useEffect(() => {
+    if (user?.name) {
+      setName(user.name || 'Anonymous')
+    }
+  }, [user])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!name.trim()) {
+      alert('Name is required')
+      return
+    }
     setIsSubmitting(true)
 
     try {
@@ -17,16 +40,18 @@ export default function CommentsForm({ postId }: { postId?: number }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          post: postId, // 'postId' မဟုတ်ဘဲ 'post' လို့ ပို့ပါ
-          userName: name, // 'userName' ဖြစ်ရပါမယ်
-          content: comment, // 'content' ဖြစ်ရပါမယ်
+          post: postId,
+          userName: name,
+          content: comment,
         }),
       })
 
       if (res.ok) {
-        setName('')
+        if (!user) setName('')
         setComment('')
-        window.location.reload()
+        setIsSubmitting(false)
+        // window.location.reload()
+        router.refresh()
       } else {
         const errorData = await res.json()
         console.log('Full Payload Error:', JSON.stringify(errorData, null, 2))
@@ -40,7 +65,7 @@ export default function CommentsForm({ postId }: { postId?: number }) {
 
   return (
     <div>
-      <form onSubmit={handleSubmit} className="mt-10 p-6 bg-slate-50 rounded-2xl">
+      <form onSubmit={handleSubmit} className="mt-2 p-4 bg-slate-50 rounded-2xl">
         <h3 className="text-lg font-bold mb-4">Leave a Reply</h3>
         <input
           className="w-full p-3 mb-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
@@ -48,6 +73,7 @@ export default function CommentsForm({ postId }: { postId?: number }) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
+          disabled={!!user} // Disable name input if user is logged in
         />
         <textarea
           className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"

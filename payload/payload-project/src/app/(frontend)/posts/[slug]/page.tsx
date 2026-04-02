@@ -5,10 +5,16 @@ import NextImage from 'next/image'
 // import { RichText } from '@/components/RichText'
 import Link from 'next/link'
 import CommentsForm from '@/components/CommentsForm'
+import { headers } from 'next/dist/server/request/headers'
 
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const payload = await getPayload({ config })
+
+  const headerLists = await headers()
+  const { user } = await payload.auth({
+    headers: headerLists,
+  })
 
   const result = await payload.find({
     collection: 'posts',
@@ -20,8 +26,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     depth: 1,
   })
   const post = result.docs[0]
-  // console.log(post)
-  // find က array ပြန်ပေးလို့ ပထမဆုံးတစ်ခုကို ယူပါတယ်
+  // console.log(post);
 
   if (!post) return notFound()
 
@@ -30,7 +35,6 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const noOfWords = (typeof post.content === 'string' ? post.content : '').split(/\s/g).length || 0
   const minutes = Math.ceil(noOfWords / wordsPerMinute)
   const readTime = `${minutes} min read`
-  // ------------------------------------------
 
   const commentResult = await payload.find({
     collection: 'comment',
@@ -39,16 +43,26 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   })
 
   return (
-    <article className="max-w-4xl mx-auto py-10 px-6">
-      {post.category && typeof post.category === 'object' && (
-        <Link
-          href={`/?category=${post.category.slug}`}
-          className="inline-block px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-xs font-bold uppercase tracking-wider mb-4 hover:bg-indigo-100 transition-colors"
-        >
-          {post.category.title}
-        </Link>
-      )}
+    <article className="max-w-4xl mx-auto py-6 px-6">
       <h1 className="text-5xl font-black text-slate-900 mb-8">{post.title}</h1>
+
+      {/* Read Time & Meta Info */}
+      <div className="flex items-center gap-4 text-sm text-indigo-600 mb-8">
+        <span className="flex items-center gap-1">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          {readTime}
+        </span>
+        <span>•</span>
+   
+        <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+      </div>
       <Link
         href={'/'}
         className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors mb-8 group"
@@ -68,13 +82,14 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         </svg>
         Back to Posts
       </Link>
+
       {/* Featured Image */}
       {post.featuredImage && typeof post.featuredImage === 'object' && (
-        <div className="relative h-96 w-full mb-10 overflow-hidden rounded-3xl shadow-xl">
+        <div className="relative h-100 w-full mb-10 overflow-hidden rounded-3xl shadow-xl">
           <NextImage
             // featuredImage က အမြဲတမ်း URL မဟုတ်နိုင်တဲ့အတွက် '?' သုံးရပါမယ်
             src={post.featuredImage?.url || '/fallback-image.jpg'} // URL မရှိရင် fallback ပုံတစ်ခု ပြခိုင်းတာပါ
-            alt={post.featuredImage?.alt || post.title}
+            alt={post.featuredImage?.alt || post.title} // alt မှာလည်း '?' သုံးပါ
             fill
             className="object-cover"
             priority
@@ -87,69 +102,45 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       <div className="prose prose-lg text-slate-700 leading-relaxed whitespace-pre-wrap">
         {post.content}
       </div>
-      <div className="flex justify-between items-center mt-8 border-t pt-4">
+
+      <div className="flex justify-between items-center mt-4 border-t pt-2">
         {/* Changed <p> to <div> to better handle the flex layout */}
-        <div className="flex justify-between w-full text-sm font-semibold text-slate-700 mt-6">
+        <div className="flex justify-between w-full text-sm font-semibold text-slate-700 mt-4">
           <span>
-            {/* post.author က object ဖြစ်နေရင် အဲဒီထဲက name ကိုပဲ ယူပြပါမယ် */}
-            Author:{' '}
-            {post.author && typeof post.author === 'object'
-              ? (post.author as any).name
-              : 'Administrator'}
+            Author: {typeof post.author === 'object' ? post.author?.name : 'Administrator'}
           </span>
-          {/* --- Reading Time  --- */}
-          <span className="text-slate- 600 font-normal ml-2"> • {readTime}</span>
           <span>
-            {/* email ကိုလည်း ထိုနည်းအတိုင်းပဲ object ထဲကနေ ဆွဲထုတ်ပါမယ် */}
-            Email:{' '}
-            {post.author && typeof post.author === 'object'
-              ? (post.author as any).email
-              : 'admin@example.com'}
+            Email: {typeof post.author === 'object' ? post.author?.email : 'admin@example.com'}
           </span>
         </div>
       </div>
 
       {/* comment section */}
-      <div className="mt-10 border-t pt-10">
-        <h2 className="text-2xl font-bold text-slate-900 mb-6">
+      <div className="mt-4 border-t pt-4">
+        <h2 className="text-sm font-bold text-slate-900 ">
           Comments ({commentResult.totalDocs})
         </h2>
-        {/* {commentResult.docs.length === 0 && (
+        {commentResult.docs.length === 0 && (
           <p className="text-slate-500 mb-8">No comments yet. Be the first to comment!</p>
-        )} */}
-        {/*No Comment */}
-        {commentResult.totalDocs === 0 ? (
-          <div className="bg-slate-50 p-10 rounded-2xl text-center mb-8">
-            <p className="text-slate-500 font-medium">
-              No comments yet. Be the first to share your thoughts!
-            </p>
-          </div>
-        ) : (
-          /* Comment Lists */
-          <div className="space-y-8 mb-10">
-            {commentResult.docs.map((c: any) => (
-              <div className="bg-slate-50 p-6 rounded-2xl" key={c.id}>
-                <div className="flex justify-between items-center mb-3">
-                  <p className="font-bold text-indigo-600"> {c.userName} </p>
-                  <span className="text-xs text-slate-400">
-                    {new Date(c.createdAt).toLocaleDateString('en-GB', {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric',
-                      minute: '2-digit',
-                      second: '2-digit',
-                      // hour12: true, // AM/PM နဲ့ ပြချင်ရင် true ထားပါ၊ ၂၄ နာရီစနစ်ဆိုရင် false ထားပါ
-                    })}
-                  </span>
-                </div>
-                <p className="text-slate-700 whitespace-pre-wrap">{c.content}</p>
-              </div>
-            ))}
-          </div>
         )}
 
-        {/* Comment Form */}
-        <CommentsForm postId={post.id} />
+        {/* Comment Form Component */}
+        <CommentsForm postId={post.id} user={user} />
+
+        {/* Comments List */}
+        <div className="space-y-8">
+          {commentResult.docs.map((comment: any) => {
+            return (
+              <div key={comment.id} className="bg-slate-100 p-4 rounded-2xl">
+                <p className="text-sm text-slate-500 font-bold">
+                  By {comment.userName || 'Anonymous'} on{' '}
+                  {new Date(comment.createdAt).toLocaleDateString()}
+                </p>
+                <p className="text-slate-700 mt-4">{comment.content}</p>
+              </div>
+            )
+          })}
+        </div>
       </div>
     </article>
   )

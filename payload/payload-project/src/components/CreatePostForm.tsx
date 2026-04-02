@@ -34,8 +34,8 @@ export default function CreatePostForm() {
       setTimeout(() => {
         router.push('/')
         router.refresh()
-      }, 500)
-      // Form ကို clear လုပ်ချင်ရင် လုပ်နိုင်ပါတယ်
+      }, 800)
+
     } else {
       setMessage('Error: ' + result.error)
     }

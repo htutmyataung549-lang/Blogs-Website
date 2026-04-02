@@ -21,6 +21,7 @@ export default function SignUpPage() {
     if (result.success) {
       setMessage('Registration successful! Redirecting to login...')
       setTimeout(() => router.push('/'), 300)
+      router.refresh() // Refresh the page to update auth state if needed
     } else {
       // TypeScript now knows .error exists because handleSignUp returns a Union Type
       setMessage(result.error || 'Registration failed. Please try again.')

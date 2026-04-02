@@ -8,6 +8,7 @@ import SearchInput from '@/components/SearchInput'
 import PostCard from '@/components/PostCard'
 import EmptyState from '@/components/EmptyState'
 import Pagination from '@/components/Pagination'
+import { headers } from 'next/headers'
 
 export default async function HomePage({
   searchParams,
@@ -56,6 +57,7 @@ export default async function HomePage({
         },
         limit: 0, // content တွေ မလိုဘူး၊ count ပဲ လိုချင်လို့
       })
+
       return {
         ...post,
         commentCount: comments.totalDocs,
@@ -63,55 +65,6 @@ export default async function HomePage({
     }),
   )
 
-  // return (
-  //   <main className={` min-h-screen bg-[#FDFDFD] text-slate-800`}>
-  //     <SearchInput /> {/* SearchInput component  */}
-  //     {/* Hero Section */}
-  //     <section className="relative overflow-hidden border-b border-slate-100 bg-white">
-  //       <div className="absolute inset-0 bg-grid-slate-50 mask-[linear-gradient(0deg,#fff,rgba(255,255,255,0.6))]" />
-  //       <div className="relative max-w-5xl mx-auto px-6 text-center">
-  //         <div className="inline-flex items-center space-x-2 px-3 rounded-full bg-indigo-50 border border-indigo-100 mb-6">
-  //           <span className="relative flex h-2 w-2">
-  //             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-  //             <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-  //           </span>
-  //           <span className="text-xs font-bold uppercase tracking-wider text-indigo-700">
-  //             Explore the latest
-  //           </span>
-  //         </div>
-  //         <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 mb-6">
-  //           My{' '}
-  //           <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-600 to-violet-600">
-  //             Blog Posts
-  //           </span>
-  //         </h1>
-  //         <p className="max-w-2xl mx-auto text-lg text-slate-500 leading-relaxed">
-  //           A place for sharing technology and new experiences. Built with the power of Payload CMS
-  //           and Next.js.
-  //         </p>
-  //       </div>
-  //     </section>
-  //     {/* Main Content (READ Operation) */}
-  //     <div className="max-w-6xl mx-auto px-6 py-6">
-  //       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-  //         {postsWithCounts.map((post: any) => (
-  //           <PostCard key={post.id} post={post} />
-  //         ))}
-  //       </div>
-
-  //       {/* Improved Empty State */}
-  //       {posts.docs.length === 0 && <EmptyState />}
-
-  //       {/* pagination */}
-  //       <Pagination currentPage={posts.page || 1} totalPages={posts.totalPages} />
-  //     </div>
-  //     <footer className="py-10 text-center border-t border-slate-100">
-  //       <p className="text-sm text-slate-400 font-medium">
-  //         © 2026 Developed with ❤️ using Payload & Next.js
-  //       </p>
-  //     </footer>
-  //   </main>
-  // )
   return (
     <main className={` min-h-screen bg-[#FDFDFD] text-slate-800`}>
       {/* Hero Section */}
